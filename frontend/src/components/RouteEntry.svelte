@@ -1,0 +1,70 @@
+<script lang="ts">
+	import type { Route } from "../stores/projects";
+	import { tag, themes } from "./Tag.svelte";
+
+	let { route }: { route: Route } = $props();
+
+	const colorTable: { [key: string]: any } = {
+		GET: themes["green"],
+		POST: themes["purple"],
+		DELETE: themes["red"],
+		PUT: themes["yellow"],
+	};
+</script>
+
+<div class="main">
+	<div class="path">
+		{@render tag(colorTable[route.method] ?? themes["green"], route.method)}
+		<h3>{route.path}</h3>
+	</div>
+	<div class="types">
+		<p>Request: {route.requestType}</p>
+		<p>Response: {route.responseType}</p>
+	</div>
+</div>
+
+<style>
+	.main {
+		display: flex;
+		padding: 2px 0px;
+		flex-direction: column;
+
+		border-bottom: 1px solid var(--border);
+	}
+
+	.path {
+		display: flex;
+		padding: 7px 12px;
+		align-items: center;
+		gap: 12px;
+		align-self: stretch;
+		position: relative;
+	}
+
+	.path > h3 {
+		color: var(--color);
+		font-size: 13px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+
+		position: absolute;
+
+		left: 68px;
+	}
+
+	.types {
+		display: flex;
+		padding: 4px 10px;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.types > p {
+		color: var(--color-inactive);
+		font-size: 10px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+	}
+</style>

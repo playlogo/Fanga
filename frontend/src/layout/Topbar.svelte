@@ -48,6 +48,8 @@
 
 		border-radius: 4px;
 		border: 1px solid var(--border);
+
+		overflow: hidden;
 	}
 
 	.switch > button {
@@ -60,7 +62,7 @@
 
 		cursor: pointer;
 
-		color: #fff;
+		color: var(--color);
 
 		font-family: "JetBrains Mono";
 		font-size: 12px;
@@ -79,7 +81,7 @@
 		align-items: center;
 		justify-content: center;
 
-		color: #fff;
+		color: var(--color);
 		font-family: "JetBrains Mono";
 		font-size: 12px;
 		font-style: normal;

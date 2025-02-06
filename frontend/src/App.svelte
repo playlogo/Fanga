@@ -8,6 +8,7 @@
 	import { tag, themes } from "./components/Tag.svelte";
 
 	import { currentProject } from "./stores/projects";
+	import Note from "./layout/Note.svelte";
 </script>
 
 <Topbar />
@@ -16,7 +17,11 @@
 <Routes />
 
 <main>
-	<RouteInspector />
+	<!--{#if currentProject}
+		<RouteInspector />
+	{:else}-->
+	<Note />
+	<!--{/if} -->
 </main>
 
 <style>
@@ -37,7 +42,5 @@
 
 	main {
 		grid-area: main;
-
-		background-color: blue;
 	}
 </style>

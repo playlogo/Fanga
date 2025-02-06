@@ -5,7 +5,7 @@ export interface Project {
 	name: string;
 	id: string;
 	url: string;
-	routes?: Route[];
+	routes: Route[];
 }
 
 export interface Route {
@@ -133,6 +133,9 @@ function useCurrentProject() {
 
 		// Set!
 		set(body);
+
+		// Change website title
+		document.title = `Fånga - ${body.name}`;
 	}
 
 	// TODO: SSE to update routes
@@ -220,6 +223,13 @@ function useProjects() {
 		await currentProject.change(body.id);
 	}
 
+	// Modals
+	function openCreateModal() {}
+
+	function openDeleteModal(id: string) {}
+
+	function openEditModal(id: string) {}
+
 	// TODO: Importing exporting
 	async function exportProjects() {
 		console.error("Not implemented");
@@ -239,6 +249,10 @@ function useProjects() {
 
 		exportProjects,
 		importProjects,
+
+		openCreateModal,
+		openDeleteModal,
+		openEditModal,
 	};
 
 	return store;

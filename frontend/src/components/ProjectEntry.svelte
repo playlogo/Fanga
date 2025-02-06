@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
-	import { currentProject, type Project } from "../stores/projects";
+	import { currentProject, projects, type Project } from "../stores/projects";
 	import { tag, themes } from "./Tag.svelte";
 
 	let { project }: { project: Project } = $props();
@@ -16,10 +16,18 @@
 		{/if}
 	</div>
 	<div class="right">
-		<button>
+		<button
+			onclick={() => {
+				projects.openDeleteModal(project.id);
+			}}
+		>
 			<Icon icon="iconamoon:trash-light" width="16px" height="16px" />
 		</button>
-		<button>
+		<button
+			onclick={() => {
+				projects.openEditModal(project.id);
+			}}
+		>
 			<Icon icon="ph:gear" width="16px" height="16px" />
 		</button>
 	</div>
@@ -43,7 +51,7 @@
 	}
 
 	.left > p {
-		color: #fff;
+		color: var(--color);
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 400;

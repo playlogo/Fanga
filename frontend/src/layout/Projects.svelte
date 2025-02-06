@@ -9,7 +9,7 @@
 <div class="main">
 	<div class="topbar">
 		<h2>Projects</h2>
-		<button>
+		<button onclick={projects.openCreateModal}>
 			<Icon icon="material-symbols:add-rounded" width="18px" height="18px" />
 		</button>
 	</div>
@@ -44,7 +44,7 @@
 	}
 
 	.topbar > h2 {
-		color: #fff;
+		color: var(--color);
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 800;

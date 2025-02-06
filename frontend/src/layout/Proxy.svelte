@@ -36,10 +36,12 @@
 <style>
 	.main {
 		grid-area: proxy;
+
+		border-right: 1px solid var(--border-accent);
 	}
 
 	.main > h2 {
-		color: #fff;
+		color: var(--color);
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 800;
@@ -73,7 +75,7 @@
 
 		width: fill-available;
 
-		color: white;
+		color: var(--color);
 		font-family: "JetBrains Mono";
 		font-size: var(--font-size-small);
 
@@ -88,7 +90,7 @@
 	}
 
 	.main > p {
-		color: #fff;
+		color: var(--color);
 		font-size: 12px;
 		font-style: normal;
 		font-weight: 400;

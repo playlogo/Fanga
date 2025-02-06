@@ -22,6 +22,9 @@
 	--font-size-medium: 12px;
 	--font-size-big: 14px;
 
+	--color-inactive: #9d9d9d;
+	--color: #fff;
+
 	--color-accent-error: var(--red);
 	--color-accent-success: var(--green);
 }
@@ -42,6 +45,26 @@ button {
 	border: none;
 
 	cursor: pointer;
+}
+
+.button {
+	background-color: var(--accent);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 4px 8px;
+
+	color: var(--color);
+
+	border-radius: 4px;
+
+	font-family: "JetBrains Mono";
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
 }
 
 p,
