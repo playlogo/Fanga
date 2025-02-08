@@ -38,12 +38,13 @@ export interface ModalAction {
 export interface State {
 	mode: "capture" | "serve";
 	proxyUrl: string;
+	demo: boolean;
 }
 
 /* State */
 function useState() {
 	const { subscribe, set, update } = writable<State>(
-		{ mode: "capture", proxyUrl: "http://localhost:4000" },
+		{ mode: "capture", proxyUrl: "http://localhost:4000", demo: false },
 		function start() {
 			(async () => {
 				// Fetch state
@@ -118,8 +119,12 @@ function useModal() {
 export const modal = useModal();
 
 /* Current project */
+type CurrentProjectType = Project & {
+	currentRoute?: Route;
+};
+
 function useCurrentProject() {
-	const { subscribe, set, update } = writable<Project | undefined>(undefined);
+	const { subscribe, set, update } = writable<CurrentProjectType | undefined>(undefined);
 
 	// Change current project
 	async function change(newProjectId: string) {
@@ -129,13 +134,21 @@ function useCurrentProject() {
 
 		// Fetch new project information from api
 		const res = await fetch(`${window.api}/projects/${newProjectId}`);
-		const body = (await res.json()) as Project;
+		const body = (await res.json()) as CurrentProjectType;
+		body.currentRoute = undefined;
 
 		// Set!
 		set(body);
 
 		// Change website title
 		document.title = `Fånga - ${body.name}`;
+	}
+
+	function changeRoute(newRouteId: string) {
+		update((state) => {
+			state!.currentRoute = state?.routes.filter((route) => route.id === newRouteId)[0];
+			return state;
+		});
 	}
 
 	// TODO: SSE to update routes
@@ -146,6 +159,7 @@ function useCurrentProject() {
 		set,
 		update,
 		change,
+		changeRoute,
 	};
 
 	return store;

@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
 	const themes = {
 		green: {
 			border: "#4CBF45",
@@ -22,10 +22,24 @@
 		},
 	};
 
-	export { tag, themes };
+	const colorTable: { [key: string]: any } = {
+		GET: themes["green"],
+		POST: themes["purple"],
+		DELETE: themes["red"],
+		PUT: themes["yellow"],
+	};
+
+	export { tag, themes, colorTable };
 </script>
 
-{#snippet tag(/** @type {{ border: any; background: any; color: any; }} */ theme, /** @type {string} */ text)}
+{#snippet tag(
+	theme: {
+		border: any;
+		background: any;
+		color: any;
+	},
+	text: string
+)}
 	<div class="tag" style={`border-color: ${theme.border}; background-color:${theme.background}; `}>
 		<p style={`color: ${theme.color}`}>{text}</p>
 	</div>

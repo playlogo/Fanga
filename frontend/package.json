@@ -10,11 +10,14 @@
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
+    "@codemirror/lang-json": "^6.0.1",
     "@iconify/svelte": "^4.2.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
+    "@uiw/codemirror-theme-vscode": "^4.23.8",
     "svelte": "^5.15.0",
     "svelte-check": "^4.1.1",
+    "svelte-codemirror-editor": "^1.4.1",
     "typescript": "~5.6.2",
     "vite": "^6.0.5"
   }

@@ -1,34 +1,13 @@
-<script>
-	import Icon from "@iconify/svelte";
+<script lang="ts">
+	let { children } = $props();
 </script>
 
-<div class="main">
-	<p class="note">Note: This is a demo instance. Changes to any project are disable!</p>
-
-	<br />
-
-	<h1>Fånga</h1>
-	<h3 style="color: var(--color-inactive)">API development evolved</h3>
-
-	<br />
-
-	<p>Record and simulate your private internal REST APIs for easy and secure public "deployments".</p>
-
-	<br />
-
-	<p>
-		Check out this project on Github: <button
-			onclick={() => {
-				//@ts-expect-error: cannot assign string
-				window.location = "https://github.com/playlogo/Fanga";
-			}}
-			class="button github"><Icon icon="mdi:github" width="24px" height="24px" />playlogo/Fanga</button
-		>
-	</p>
+<div class="note">
+	{@render children()}
 </div>
 
 <style>
-	.main {
+	.note {
 		max-width: 600px;
 
 		margin-left: auto;
@@ -37,17 +16,17 @@
 		margin-top: 40px;
 	}
 
-	br {
+	:global(.note > br) {
 		line-height: 150%;
 	}
 
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
+	:global(.note > p),
+	:global(.note > h1),
+	:global(.note > h2),
+	:global(.note > h3),
+	:global(.note > h4),
+	:global(.note > h5),
+	:global(.note > h6) {
 		color: var(--color);
 
 		display: flex;
@@ -55,21 +34,7 @@
 		gap: 16px;
 	}
 
-	/* Special */
-	button.github {
-		background-color: black;
-
-		display: flex;
-		align-items: center;
-		gap: 8px;
-
-		padding-left: 12px;
-		padding-right: 12px;
-		padding-top: 6px;
-		padding-bottom: 6px;
-	}
-
-	.note {
+	:global(.note > .indent) {
 		padding-top: 24px;
 		padding-bottom: 24px;
 		padding-left: 12px;

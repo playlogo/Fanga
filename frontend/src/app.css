@@ -34,7 +34,8 @@ body {
 
 	background-color: var(--bg);
 
-	font-family: "JetBrains Mono";
+	font-family: Menlo, Monaco, Consolas, "Andale Mono", "Ubuntu Mono", "Courier New", monospace;
+	overflow-x: hidden;
 }
 
 button {
@@ -76,4 +77,21 @@ h5,
 h6 {
 	margin: 0;
 	padding: 0;
+}
+
+/* Codemirror */
+.cm-activeLine {
+	background: transparent !important;
+}
+.cm-focused .cm-activeLine {
+	background: #ffffff0f !important;
+}
+
+.cm-activeLineGutter {
+	background: transparent !important;
+	color: unset !important;
+}
+.cm-focused .cm-activeLineGutter {
+	background: #ffffff0f !important;
+	color: #fff !important;
 }

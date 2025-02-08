@@ -5,10 +5,10 @@
 	import Routes from "./layout/Routes.svelte";
 	import Topbar from "./layout/Topbar.svelte";
 
-	import { tag, themes } from "./components/Tag.svelte";
-
 	import { currentProject } from "./stores/projects";
 	import Note from "./layout/Note.svelte";
+	import WelcomeNote from "./notes/WelcomeNote.svelte";
+	import StarterNote from "./notes/StarterNote.svelte";
 </script>
 
 <Topbar />
@@ -17,11 +17,15 @@
 <Routes />
 
 <main>
-	<!--{#if currentProject}
-		<RouteInspector />
-	{:else}-->
-	<Note />
-	<!--{/if} -->
+	{#if $currentProject}
+		{#if $currentProject.currentRoute}
+			<RouteInspector route={$currentProject.currentRoute} />
+		{:else}
+			<Note><WelcomeNote /></Note>
+		{/if}
+	{:else}
+		<Note><WelcomeNote /></Note>
+	{/if}
 </main>
 
 <style>
@@ -42,5 +46,7 @@
 
 	main {
 		grid-area: main;
+
+		overflow-y: auto;
 	}
 </style>

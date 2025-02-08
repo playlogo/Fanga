@@ -1,18 +1,18 @@
 <script lang="ts">
-	import type { Route } from "../stores/projects";
-	import { tag, themes } from "./Tag.svelte";
+	import { currentProject, type Route } from "../stores/projects";
+	import { tag, themes, colorTable } from "./Tag.svelte";
 
 	let { route }: { route: Route } = $props();
-
-	const colorTable: { [key: string]: any } = {
-		GET: themes["green"],
-		POST: themes["purple"],
-		DELETE: themes["red"],
-		PUT: themes["yellow"],
-	};
 </script>
 
-<div class="main">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
+	class="main"
+	onclick={() => {
+		currentProject.changeRoute(route.id);
+	}}
+>
 	<div class="path">
 		{@render tag(colorTable[route.method] ?? themes["green"], route.method)}
 		<h3>{route.path}</h3>
