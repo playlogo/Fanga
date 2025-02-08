@@ -8,7 +8,7 @@
 		url.classList.remove("success");
 		url.classList.remove("error");
 
-		navigator.clipboard.writeText($state.proxyUrl).then(
+		navigator.clipboard.writeText($state.proxyUrl!).then(
 			function () {
 				url.classList.add("success");
 			},
@@ -23,14 +23,18 @@
 <div class="main">
 	<h2>Proxy</h2>
 
-	<div class="url" bind:this={url}>
-		<input type="text" readonly value={$state.proxyUrl} />
-		<button onclick={copyProxyUrl}>
-			<Icon icon="lucide:copy" width="16px" height="16px" />
-		</button>
-	</div>
+	{#if $state.proxyUrl}
+		<div class="url" bind:this={url}>
+			<input type="text" readonly value={$state.proxyUrl} />
+			<button onclick={copyProxyUrl}>
+				<Icon icon="lucide:copy" width="16px" height="16px" />
+			</button>
+		</div>
 
-	<p>Use this address in your Browser/App to access the api</p>
+		<p>Use this address in your Browser/App to access the api</p>
+	{:else}
+		<p>Start capturing / serving a project to see the proxy URL</p>
+	{/if}
 </div>
 
 <style>

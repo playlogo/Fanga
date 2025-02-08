@@ -36,15 +36,15 @@ export interface ModalAction {
 }
 
 export interface State {
-	mode: "capture" | "serve";
-	proxyUrl: string;
+	mode: "capture" | "serve" | "pause";
+	proxyUrl?: string;
 	demo: boolean;
 }
 
 /* State */
 function useState() {
 	const { subscribe, set, update } = writable<State>(
-		{ mode: "capture", proxyUrl: "http://localhost:4000", demo: false },
+		{ mode: "pause", proxyUrl: undefined, demo: false },
 		function start() {
 			(async () => {
 				// Fetch state
@@ -141,6 +141,7 @@ function useCurrentProject() {
 		set(body);
 
 		// Change website title
+		//@ts-ignore-error Document not found
 		document.title = `Fånga - ${body.name}`;
 	}
 

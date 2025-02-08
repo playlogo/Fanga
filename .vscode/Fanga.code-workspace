@@ -7,5 +7,7 @@
 			"path": "../backend"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"deno.enable": true
+	}
 }

@@ -21,6 +21,14 @@
 		>
 			Serve
 		</button>
+		<button
+			class:active={$state.mode === "pause"}
+			onclick={() => {
+				state.change("pause");
+			}}
+		>
+			Pause
+		</button>
 	</div>
 
 	<button class="dropdown">
