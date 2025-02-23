@@ -1,7 +1,9 @@
 <script lang="ts">
-	import CodeViewer from "../components/CodeViewer.svelte";
+	import type { Route } from "../stores/types";
+
 	import { tag, themes, colorTable } from "../components/Tag.svelte";
-	import type { Route } from "../stores/projects";
+	import CodeViewer from "../components/CodeViewer.svelte";
+	import { currentProject } from "../stores/currentProject";
 
 	let { route }: { route: Route } = $props();
 
@@ -10,7 +12,7 @@
 
 	// Fetch response & request
 	(async () => {
-		const res = await fetch(`${window.api}/routes/${route.id}`);
+		const res = await fetch(`${window.api}/projects/${$currentProject?.id}/routes/${route.id}`);
 
 		if (!res.ok) {
 			console.error("Unable to load route");

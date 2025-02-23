@@ -1,6 +1,10 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
-	import { currentProject, projects, type Project } from "../stores/projects";
+
+	import type { Project } from "../stores/types";
+	import { projects } from "../stores/projects";
+	import { currentProject } from "../stores/currentProject";
+
 	import { tag, themes } from "./Tag.svelte";
 
 	let { project }: { project: Project } = $props();
@@ -8,25 +12,31 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="container" onclick={() => currentProject.change(project.id)}>
+<div
+	class="container"
+	class:active={$currentProject && $currentProject.id === project.id}
+	onclick={() => currentProject.activate(project.id)}
+>
 	<div class="left">
 		<p>{project.name}</p>
-		{#if project.active}
+		{#if $currentProject && $currentProject.id === project.id}
 			{@render tag(themes["green"], "active")}
 		{/if}
 	</div>
 	<div class="right">
 		<button
 			onclick={() => {
-				projects.openDeleteModal(project.id);
+				projects.openDeleteModal(project);
 			}}
+			style="--color: #FD4D4D;"
 		>
 			<Icon icon="iconamoon:trash-light" width="16px" height="16px" />
 		</button>
 		<button
 			onclick={() => {
-				projects.openEditModal(project.id);
+				projects.openEditModal(project);
 			}}
+			style="--color: var(--border-accent);"
 		>
 			<Icon icon="ph:gear" width="16px" height="16px" />
 		</button>
@@ -42,6 +52,18 @@
 		justify-content: space-between;
 		align-items: center;
 		align-self: stretch;
+		height: 48px;
+		border-bottom: 1px solid var(--border);
+
+		cursor: pointer;
+	}
+
+	.container:hover {
+		background-color: #ffffff;
+	}
+
+	.active {
+		cursor: default !important;
 	}
 
 	.left {
@@ -56,5 +78,9 @@
 		font-style: normal;
 		font-weight: 400;
 		line-height: normal;
+	}
+
+	button {
+		color: var(--color);
 	}
 </style>

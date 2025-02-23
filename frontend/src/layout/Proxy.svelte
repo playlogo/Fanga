@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
-	import { state } from "../stores/projects";
+
+	import { state } from "../stores/state";
 
 	let url: HTMLElement;
 

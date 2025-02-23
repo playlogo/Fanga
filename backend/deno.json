@@ -1,5 +1,9 @@
 {
     "tasks": {
-        "dev": "deno --watch --allow-write --allow-read --allow-env --allow-net src/main.ts"
+        "dev": "deno --watch --allow-write --allow-read --allow-env --allow-net src/main.ts",
+        "run": "deno run --allow-write --allow-read --allow-env --allow-net src/main.ts",
+        "cache": "deno cache src/main.ts",
+        "lint": "deno lint",
+        "check": "deno check src/main.ts src/**/*.ts --allow-import"
     }
 }

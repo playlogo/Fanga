@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { currentProject, type Route } from "../stores/projects";
+	import type { Route } from "../stores/types";
+	import { currentProject } from "../stores/currentProject";
+
 	import { tag, themes, colorTable } from "./Tag.svelte";
 
 	let { route }: { route: Route } = $props();

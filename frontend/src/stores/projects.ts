@@ -1,172 +1,9 @@
 import { writable, get } from "svelte/store";
 
-export interface Project {
-	active: boolean;
-	name: string;
-	id: string;
-	url: string;
-	routes: Route[];
-}
+import type { Project } from "./types";
 
-export interface Route {
-	id: string;
-	method: string;
-	path: string;
-	requestType: string;
-	responseType: string;
-}
-
-export interface Modal {
-	title: string;
-	content: string;
-	inputs: ModalInput[];
-	actions: ModalAction[];
-}
-
-export interface ModalInput {
-	type: "checkbox" | "text";
-	label: string;
-	id: string;
-}
-
-export interface ModalAction {
-	label: string;
-	color: "accent" | "warning" | "default";
-	callback: Function;
-}
-
-export interface State {
-	mode: "capture" | "serve" | "pause";
-	proxyUrl?: string;
-	demo: boolean;
-}
-
-/* State */
-function useState() {
-	const { subscribe, set, update } = writable<State>(
-		{ mode: "pause", proxyUrl: undefined, demo: false },
-		function start() {
-			(async () => {
-				// Fetch state
-				const res = await fetch(`${window.api}/state`);
-				const state = (await res.json()) as State;
-
-				set(state);
-			})();
-		}
-	);
-
-	// Change current state
-	async function change(newMode: State["mode"]) {
-		if (get(store).mode === newMode) {
-			return;
-		}
-
-		// Fetch new project information from api
-		const res = await fetch(`${window.api}/state/${newMode}`, {
-			method: "POST",
-		});
-
-		if (res.ok) {
-			update((state) => {
-				state.mode = newMode;
-
-				return state;
-			});
-		} else {
-			console.error("Failed to change state");
-		}
-	}
-
-	// Store store
-	const store = {
-		subscribe,
-		set,
-		update,
-		change,
-	};
-
-	return store;
-}
-
-export const state = useState();
-
-/* Modal */
-function useModal() {
-	const { subscribe, set, update } = writable<Modal | undefined>(undefined);
-
-	// Open a modal
-	async function create(data: Modal) {
-		set(data);
-	}
-
-	// Close modal
-	async function close() {
-		set(undefined);
-	}
-
-	// Store store
-	const store = {
-		subscribe,
-		set,
-		update,
-		create,
-	};
-
-	return store;
-}
-
-export const modal = useModal();
-
-/* Current project */
-type CurrentProjectType = Project & {
-	currentRoute?: Route;
-};
-
-function useCurrentProject() {
-	const { subscribe, set, update } = writable<CurrentProjectType | undefined>(undefined);
-
-	// Change current project
-	async function change(newProjectId: string) {
-		if (get(store)?.id === newProjectId) {
-			return;
-		}
-
-		// Fetch new project information from api
-		const res = await fetch(`${window.api}/projects/${newProjectId}`);
-		const body = (await res.json()) as CurrentProjectType;
-		body.currentRoute = undefined;
-
-		// Set!
-		set(body);
-
-		// Change website title
-		//@ts-ignore-error Document not found
-		document.title = `Fånga - ${body.name}`;
-	}
-
-	function changeRoute(newRouteId: string) {
-		update((state) => {
-			state!.currentRoute = state?.routes.filter((route) => route.id === newRouteId)[0];
-			return state;
-		});
-	}
-
-	// TODO: SSE to update routes
-
-	// Store store
-	const store = {
-		subscribe,
-		set,
-		update,
-		change,
-		changeRoute,
-	};
-
-	return store;
-}
-
-export const currentProject = useCurrentProject();
+import { modal } from "./modal";
+import { currentProject } from "./currentProject";
 
 /* Project list */
 function useProjects() {
@@ -180,7 +17,7 @@ function useProjects() {
 
 			// Update current project to active one
 			if (projects.filter((entry) => entry.active).length === 1) {
-				await currentProject.change(projects.filter((entry) => entry.active)[0].id);
+				await currentProject.activate(projects.filter((entry) => entry.active)[0].id);
 			}
 		})();
 	});
@@ -235,15 +72,94 @@ function useProjects() {
 		});
 
 		// Update current active one
-		await currentProject.change(body.id);
+		await currentProject.activate(body.id);
 	}
 
 	// Modals
 	function openCreateModal() {}
 
-	function openDeleteModal(id: string) {}
+	function openDeleteModal(project: Project) {
+		async function callback(res: any) {
+			// @ts-expect-error this any
+			const project: Project = this;
 
-	function openEditModal(id: string) {}
+			await fetch(`${window.api}/projects/${project.id}`, {
+				method: "DELETE",
+			});
+
+			window.location.reload();
+		}
+
+		modal.set({
+			title: `Delete ${project.name}`,
+			content: "This will delete this project IRREVERSIBLY",
+			inputs: [],
+			actions: [
+				{
+					label: "Cancel",
+					color: "default",
+					callback: modal.close,
+				},
+				{
+					label: "Update",
+					color: "warning",
+					callback: callback.bind(project),
+				},
+			],
+		});
+	}
+
+	function openEditModal(project: Project) {
+		async function callback(res: any) {
+			// @ts-expect-error this any
+			const project: Project = this;
+
+			const name = res.inputs["name"];
+			const url = res.inputs["url"];
+
+			await fetch(`${window.api}/projects/${project.id}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					name: name,
+					url: url,
+				}),
+			});
+
+			window.location.reload();
+		}
+
+		modal.set({
+			title: `Edit ${project.name}`,
+			content: "Change the name or url of the project.",
+			inputs: [
+				{
+					type: "text",
+					label: "Target URL for proxy",
+					id: "url",
+					default: project.url,
+				},
+				{
+					type: "text",
+					label: "Project name",
+					id: "name",
+					default: project.name,
+				},
+			],
+			actions: [
+				{
+					label: "Cancel",
+					color: "default",
+					callback: modal.close,
+				},
+				{
+					label: "Update",
+					color: "accent",
+					callback: callback.bind(project),
+				},
+			],
+		});
+	}
 
 	// TODO: Importing exporting
 	async function exportProjects() {

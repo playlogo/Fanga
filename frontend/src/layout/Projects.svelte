@@ -1,9 +1,9 @@
 <script>
 	import Icon from "@iconify/svelte";
 
-	import ProjectEntry from "../components/ProjectEntry.svelte";
-
 	import { projects } from "../stores/projects";
+
+	import ProjectEntry from "../components/ProjectEntry.svelte";
 </script>
 
 <div class="main">

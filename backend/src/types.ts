@@ -1,12 +1,13 @@
-interface Project {
+export interface ProjectType {
 	name: string;
 	id: string;
 	active?: boolean;
 	url: string;
-	routes: Route[];
+	fileName: string;
+	routes?: RouteType[];
 }
 
-interface Route {
+export interface RouteType {
 	id: string;
 	method: string;
 	path: string;
@@ -14,17 +15,21 @@ interface Route {
 	responseType: string;
 }
 
-interface State {
+export type ProxyState = "capture" | "serve" | "pause";
+
+export interface StateType {
 	currentProject: string | undefined;
-	mode: "capture" | "serve" | "pause";
+	mode: ProxyState;
 	proxyUrl: string;
 	demo: boolean;
 }
 
-interface RouteSerialized {
+export interface RouteSerializedType {
 	id: string;
 	request: string;
 	response: string;
+	requestType: string;
+	responseType: string;
 	path: string;
 	method: string;
 }

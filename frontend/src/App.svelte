@@ -5,10 +5,11 @@
 	import Routes from "./layout/Routes.svelte";
 	import Topbar from "./layout/Topbar.svelte";
 
-	import { currentProject } from "./stores/projects";
 	import Note from "./layout/Note.svelte";
 	import WelcomeNote from "./notes/WelcomeNote.svelte";
 	import StarterNote from "./notes/StarterNote.svelte";
+
+	import { currentProject } from "./stores/currentProject";
 </script>
 
 <Topbar />

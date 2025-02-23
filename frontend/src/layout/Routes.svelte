@@ -1,6 +1,8 @@
 <script>
+	import { projects } from "../stores/projects";
+	import { currentProject } from "../stores/currentProject";
+
 	import RouteEntry from "../components/RouteEntry.svelte";
-	import { currentProject, projects } from "../stores/projects";
 </script>
 
 <div class="main">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import CodeMirror from "svelte-codemirror-editor";
 	import { json } from "@codemirror/lang-json";
+
 	import { vscodeDark } from "../lib/VSCodeTheme";
 
 	let { content, lang }: { content: string; lang: string } = $props();
