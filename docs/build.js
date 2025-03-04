@@ -4,14 +4,14 @@ const fs = require('fs');
 const expressJSDocSwagger = require('express-jsdoc-swagger');
 
 // Get version
-let version = "1.0.0"
+let version = "1.1.0"
 
 // Swagger options
 const options = {
     info: {
         version: version,
         title: 'Fanga',
-        description: "Fanga Backend API",
+        description: "Docs for the REST API of the Fanga backend. <br> <br> Checkout Fanga on Github: https://github.com/playlogo/Fanga ",
         license: {
             name: 'MIT',
         },

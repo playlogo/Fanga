@@ -136,6 +136,7 @@ export class ProjectManager {
 
 	routes(server: Server) {
 		/* Projects */
+
 		/**
 		 * @typedef {object} Project
 		 * @summary A project entry
@@ -162,6 +163,17 @@ export class ProjectManager {
 		 * @tags projects
 		 * @return {array<Project>} 200 - List of projects
 		 * @return {ResponseError} 500 - Error
+		 * @example response - 200 - response example
+		 * [
+		 * 		{
+		 *     		"name": "Bumble",
+		 *     		"id": "zdhj8ka21",
+		 *     		"active": false,
+		 * 	   		"url": "http://api.bumble.hackclub.app",
+		 *     		"fileName": "bumble.jsonl",
+		 *     		"routes": []
+		 * 		}
+		 * ]
 		 */
 		server.get("/projects", setCORS(), res("json"), (ctx: Context) => {
 			ctx.res.body = Object.values(this.projects)
@@ -228,6 +240,20 @@ export class ProjectManager {
 		 * @param {NewProject} request.body.required - Project properties
 		 * @return {Project} 200 - Successfully created project
 		 * @return {ResponseError} 500 - Error
+		 * @example request - Payload example
+		 * {
+		 *   "name": "Bumble",
+		 *   "url": "http://api.bumble.hackclub.app"
+		 * }
+		 * @example response - 200 - Success example
+		 * {
+		 *     "name": "Bumble",
+		 *     "id": "zdhj8ka21",
+		 *     "active": false,
+		 * 	   "url": "http://api.bumble.hackclub.app",
+		 *     "fileName": "bumble.jsonl",
+		 *     "routes": []
+		 * }
 		 */
 		server.post(
 			"/projects",
@@ -298,6 +324,17 @@ export class ProjectManager {
 		);
 
 		/* Routes */
+
+		/**
+		 * GET /api/projects/{projectId}/routes
+		 * @summary List all routes of a active project
+		 * @tags routes
+		 * @param {string} projectId.path - Project id
+		 * @return {array<RouteDescription>} 200 - List of routes
+		 * @return {ResponseError} 401 - Project not found
+		 * @return {ResponseError} 402 - Project not active
+		 * @return {ResponseError} 500 - Error
+		 */
 		server.get(
 			"/projects/:projectId/routes",
 			setCORS(),
@@ -315,14 +352,32 @@ export class ProjectManager {
 				if (this.activeProject?.project.id === projectId) {
 					ctx.res.body = await this.activeProject.listRoutes();
 				} else {
-					ctx.res.status = 401;
+					ctx.res.status = 402;
 					ctx.res.statusText = "Project not active";
 
 					return;
 				}
 			}).bind(this)
-		); // List routes
+		);
 
+		/**
+		 * @typedef {object} RouteInspect
+		 * @summary A detailed route entry
+		 * @property {object} request - Capture request body
+		 * @property {object} response - Capture response body
+		 */
+
+		/**
+		 * GET /api/projects/{projectId}/routes/{routeId}
+		 * @summary Inspect a route of a active project
+		 * @tags routes
+		 * @param {string} projectId.path - Project id
+		 * @param {string} routeId.path - Route id
+		 * @return {RouteInspect} 200 - List of projects
+		 * @return {ResponseError} 401 - Project not found
+		 * @return {ResponseError} 402 - Project not active
+		 * @return {ResponseError} 500 - Error
+		 */
 		server.get(
 			"/projects/:projectId/routes/:routeId",
 			setCORS(),
@@ -341,14 +396,25 @@ export class ProjectManager {
 				if (this.activeProject?.project.id === projectId) {
 					ctx.res.body = await this.activeProject.inspectRoute(routeId);
 				} else {
-					ctx.res.status = 401;
+					ctx.res.status = 402;
 					ctx.res.statusText = "Project not active";
 
 					return;
 				}
 			}).bind(this)
-		); // Inspect routes
+		);
 
+		/**
+		 * DELETE /api/projects/{projectId}/routes/{routeId}
+		 * @summary Delete a route of a active project
+		 * @tags routes
+		 * @param {string} projectId.path - Project id
+		 * @param {string} routeId.path - Route id
+		 * @return {object} 200 - Successfully delete project
+		 * @return {ResponseError} 401 - Project not found
+		 * @return {ResponseError} 402 - Project not active
+		 * @return {ResponseError} 500 - Error
+		 */
 		server.delete(
 			"/projects/:projectId/routes/:routeId",
 			setCORS(),
@@ -366,15 +432,39 @@ export class ProjectManager {
 				if (this.activeProject?.project.id === projectId) {
 					ctx.res.body = await this.activeProject.deleteRoute(routeId);
 				} else {
-					ctx.res.status = 401;
+					ctx.res.status = 402;
 					ctx.res.statusText = "Project not active";
 
 					return;
 				}
 			}).bind(this)
-		); // Delete route routes
+		);
 
 		/* State */
+
+		/**
+		 * @typedef {object} State
+		 * @summary State of the backend
+		 * @property {string} currentProject - Current active project
+		 * @property {string} mode - Proxy state - enum:capture,serve,pause
+		 * @property {string} proxyUrl - Proxy url
+		 * @property {boolean} demo - Demo mode enabled
+		 */
+
+		/**
+		 * GET /api/state/
+		 * @summary Get the state of the backend
+		 * @tags state
+		 * @return {State} 200 - Current state
+		 * @return {ResponseError} 500 - Error
+		 * @example response - 200 - response example
+		 * 	{
+		 *     		"currentProject": "Bumble",
+		 *     		"mode": "capture",
+		 *     		"proxyUrl": "http://api.bumble.hackclub.app",
+		 * 	   		"demo": false
+		 * 	}
+		 */
 		server.get(
 			"/state",
 			setCORS(),
@@ -384,6 +474,20 @@ export class ProjectManager {
 			}).bind(this)
 		);
 
+		/**
+		 * @typedef {object} ModeUpdate
+		 * @summary Mode update body
+		 * @property {string} state - New state - enum:capture,serve,pause
+		 */
+
+		/**
+		 * POST /api/state/
+		 * @summary Update the mode of the backend
+		 * @tags state
+		 * @param {ModeUpdate} request.body.required - New mode
+		 * @return {object} 200 - Successfully updated mode
+		 * @return {ResponseError} 500 - Error
+		 */
 		server.options("/state", setCORS());
 		server.post("/state", req("json"), setCORS(), async (ctx: Context) => {
 			const body: { state: ProxyState } = ctx.body;
@@ -406,7 +510,7 @@ export class ProjectManager {
 			} else {
 				ctx.res.status = 401;
 			}
-		}); // Change state
+		});
 	}
 }
 
