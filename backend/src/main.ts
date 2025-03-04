@@ -1,6 +1,6 @@
 import { Server, setCORS } from "https://deno.land/x/faster@v12.1/mod.ts";
 import staticRoutes from "./api/static.ts";
-import projects from "./projects.ts";
+import projectManager from "./projects/projectManager.ts";
 
 const server = new Server();
 
@@ -15,14 +15,14 @@ server.useAtBeginning(async (ctx, next) => {
 });
 
 // Collect projects
-projects.collect();
-projects.routes(server);
+projectManager.collect();
+projectManager.routes(server);
 
 globalThis.addEventListener("unload", async () => {});
 
 Deno.addSignalListener("SIGINT", async () => {
 	console.log("[exit] Saving projects");
-	await projects.exit();
+	await projectManager.exit();
 	console.log("[exit] Done");
 	Deno.exit(0);
 });

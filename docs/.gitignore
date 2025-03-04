@@ -1,0 +1,4 @@
+node_modules/
+spec.json
+pnpm-lock.yaml
+index.html

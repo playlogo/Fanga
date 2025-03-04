@@ -1,6 +1,11 @@
 import { Server, serveStatic, Context, NextFunc, redirect } from "https://deno.land/x/faster@v12.1/mod.ts";
 import { lookup } from "https://deno.land/x/mrmime@v2.0.0/mod.ts";
 
+/**
+ * @typedef {object} ResponseError
+ * @property {string} error - Error message
+ */
+
 export default function exampleRoutes(server: Server) {
 	server.get("", redirect("/index.html"));
 	server.get("/", redirect("/index.html"));

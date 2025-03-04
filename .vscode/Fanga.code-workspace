@@ -8,6 +8,7 @@
 		}
 	],
 	"settings": {
-		"deno.enable": true
+		"deno.enable": true,
+		"liveServer.settings.multiRootWorkspaceName": "Fanga"
 	}
 }

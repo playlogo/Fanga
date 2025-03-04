@@ -1,1 +1,0 @@
-{"name":"bumble","routes":[{"id":"6RtuTAJhFI","method":"POST","path":"/test","requestType":"application/json","responseType":"text/html; charset=UTF-8"}],"url":"https://google.de","fileName":"bumble.txt","id":"asdasdasd","active":false}
