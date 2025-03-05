@@ -76,7 +76,42 @@ function useProjects() {
 	}
 
 	// Modals
-	function openCreateModal() {}
+	function openCreateModal() {
+		const cb = async (res: any) => {
+			await projects.createProject(res.name, res.url);
+		};
+
+		modal.set({
+			title: "Create new project",
+			content: "Create a new empty project to capture and serve a REST API",
+			actions: [
+				{
+					label: "Cancel",
+					color: "default",
+					callback: modal.close,
+				},
+				{
+					label: "Create",
+					color: "accent",
+					callback: cb,
+				},
+			],
+			inputs: [
+				{
+					type: "text",
+					label: "Name",
+					id: "name",
+					default: "MyAwesomeAPI",
+				},
+				{
+					type: "text",
+					label: "Target URL",
+					id: "url",
+					default: "https://my.api.com",
+				},
+			],
+		});
+	}
 
 	function openDeleteModal(project: Project) {
 		async function callback(res: any) {
