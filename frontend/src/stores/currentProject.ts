@@ -22,11 +22,18 @@ function useCurrentProject() {
 		document.title = `Fånga - ${body.name}`;
 	}
 
-	function changeRoute(newRouteId: string) {
+	async function changeRoute(newRouteId: string) {
 		update((state) => {
-			state!.currentRoute = state?.routes.filter((route) => route.id === newRouteId)[0];
+			state!.currentRoute = "switching";
 			return state;
 		});
+
+		setTimeout(() => {
+			update((state) => {
+				state!.currentRoute = state?.routes.filter((route) => route.id === newRouteId)[0];
+				return state;
+			});
+		}, 1);
 	}
 
 	// TODO: SSE to update routes

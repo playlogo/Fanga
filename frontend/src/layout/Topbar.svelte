@@ -31,10 +31,11 @@
 			Pause
 		</button>
 	</div>
-
+	<!--
 	<button class="dropdown">
 		Projects <Icon icon="ri:arrow-drop-down-line" width="24px" height="24px" /></button
 	>
+		-->
 </div>
 
 <style>

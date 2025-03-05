@@ -1,3 +1,5 @@
+import { parseArgs } from "jsr:@std/cli/parse-args";
+
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
 import { Context, Server, req, res, setCORS } from "https://deno.land/x/faster@v12.1/mod.ts";
 
@@ -11,7 +13,7 @@ export class ProjectManager {
 	state: StateType = {
 		currentProject: undefined,
 		demo: false,
-		proxyUrl: "",
+		proxyPort: undefined,
 		mode: "pause",
 	};
 
@@ -82,6 +84,43 @@ export class ProjectManager {
 
 			if (state === "serve") {
 				await this.activeProject!.serve();
+			}
+		}
+	}
+
+	async args() {
+		const flags = parseArgs(Deno.args, {
+			boolean: ["serve", "capture"],
+			string: ["project"],
+			default: { capture: false, serve: false },
+		});
+
+		// Activate project
+		if (flags.project !== undefined) {
+			const lookup = Object.values(this.projects).filter(
+				(entry) => entry.project.name === flags.project
+			);
+
+			if (lookup.length !== 1) {
+				console.error(`Unknown project '${flags.project}'`);
+				Deno.exit(2);
+			}
+
+			await this.activateProject(lookup[0].project.id);
+
+			console.log(`[startup] Activated project`);
+
+			// Set mode
+			if (flags.capture) {
+				this.state.proxyPort = await this.activeProject?.capture();
+				this.state.mode = "capture";
+
+				console.log(`[startup] Started capture mode`);
+			} else if (flags.serve) {
+				this.state.proxyPort = await this.activeProject?.serve();
+				this.state.mode = "serve";
+
+				console.log(`[startup] Started serve mode`);
 			}
 		}
 	}
@@ -223,7 +262,7 @@ export class ProjectManager {
 
 				await this.deleteProject(projectId);
 
-				console.log(`[projects] Deleted project '${this.activeProject!.project.name}'`);
+				console.log(`[projects] Deleted project '${projectId}'`);
 			}).bind(this)
 		);
 
@@ -255,6 +294,7 @@ export class ProjectManager {
 		 *     "routes": []
 		 * }
 		 */
+		server.options("/projects", setCORS());
 		server.post(
 			"/projects",
 			setCORS(),
@@ -273,6 +313,7 @@ export class ProjectManager {
 
 				this.projects[newProject.id] = new Project(newProject, this);
 
+				await this.projects[newProject.id].unload();
 				await this.activateProject(newProject.id);
 
 				ctx.res.body = newProject;
@@ -294,6 +335,7 @@ export class ProjectManager {
 		 * @return {object} 200 - Successfully updated project
 		 * @return {ResponseError} 500 - Error
 		 */
+		server.options("/projects/:projectId", setCORS());
 		server.post(
 			"/projects/:projectId",
 			setCORS(),
@@ -447,7 +489,7 @@ export class ProjectManager {
 		 * @summary State of the backend
 		 * @property {string} currentProject - Current active project
 		 * @property {string} mode - Proxy state - enum:capture,serve,pause
-		 * @property {string} proxyUrl - Proxy url
+		 * @property {string} proxyPort - Proxy port
 		 * @property {boolean} demo - Demo mode enabled
 		 */
 
@@ -461,7 +503,7 @@ export class ProjectManager {
 		 * 	{
 		 *     		"currentProject": "Bumble",
 		 *     		"mode": "capture",
-		 *     		"proxyUrl": "http://api.bumble.hackclub.app",
+		 *     		"proxyPort": "4001",
 		 * 	   		"demo": false
 		 * 	}
 		 */
@@ -489,23 +531,24 @@ export class ProjectManager {
 		 * @return {ResponseError} 500 - Error
 		 */
 		server.options("/state", setCORS());
-		server.post("/state", req("json"), setCORS(), async (ctx: Context) => {
+		server.post("/state", req("json"), res("json"), setCORS(), async (ctx: Context) => {
 			const body: { state: ProxyState } = ctx.body;
 
 			if (this.activeProject !== undefined) {
 				if (body.state === "pause") {
-					await this.activeProject.pause();
+					this.state.proxyPort = await this.activeProject.pause();
 				}
 
 				if (body.state === "capture") {
-					await this.activeProject.capture();
+					this.state.proxyPort = await this.activeProject.capture();
 				}
 
 				if (body.state === "serve") {
-					await this.activeProject.serve();
+					this.state.proxyPort = await this.activeProject.serve();
 				}
 
 				this.state.mode = body.state;
+				ctx.res.body = this.state;
 				console.log(`[projects] Changed state to '${body.state}'`);
 			} else {
 				ctx.res.status = 401;

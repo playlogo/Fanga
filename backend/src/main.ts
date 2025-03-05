@@ -15,18 +15,27 @@ server.useAtBeginning(async (ctx, next) => {
 });
 
 // Collect projects
-projectManager.collect();
-projectManager.routes(server);
+await projectManager.collect();
+await projectManager.routes(server);
+await projectManager.args();
 
-globalThis.addEventListener("unload", async () => {});
+staticRoutes(server); // Put as last router!
+
+// Capture exit
+let exiting = false;
 
 Deno.addSignalListener("SIGINT", async () => {
+	if (exiting) {
+		return;
+	}
+
+	exiting = true;
+
 	console.log("[exit] Saving projects");
 	await projectManager.exit();
 	console.log("[exit] Done");
 	Deno.exit(0);
 });
 
-staticRoutes(server); // Put as last router!
-
+// Start api
 await server.listen({ port: 8000 });
