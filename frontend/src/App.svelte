@@ -8,9 +8,15 @@
 	import Note from "./layout/Note.svelte";
 	import WelcomeNote from "./notes/WelcomeNote.svelte";
 	import StarterNote from "./notes/StarterNote.svelte";
+	import Modal from "./components/Modal.svelte";
 
 	import { currentProject } from "./stores/currentProject";
+	import { modal } from "./stores/modal";
 </script>
+
+{#if $modal}
+	<Modal />
+{/if}
 
 <Topbar />
 <Projects />
