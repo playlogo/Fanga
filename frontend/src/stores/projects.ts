@@ -17,7 +17,7 @@ function useProjects() {
 
 			// Update current project to active one
 			if (projects.filter((entry) => entry.active).length === 1) {
-				await currentProject.activate(projects.filter((entry) => entry.active)[0].id);
+				await currentProject.setActiveProject(projects.filter((entry) => entry.active)[0]);
 			}
 		})();
 	});

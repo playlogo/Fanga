@@ -1,6 +1,7 @@
 import { writable, get } from "svelte/store";
 
-import type { CurrentProjectType } from "./types";
+import type { CurrentProjectType, Project } from "./types";
+import { state } from "./state";
 
 function useCurrentProject() {
 	const { subscribe, set, update } = writable<CurrentProjectType | undefined>(undefined);
@@ -12,10 +13,17 @@ function useCurrentProject() {
 		}
 
 		// Fetch new project information from api
-		const res = await fetch(`${window.api}/projects/${newProjectId}/activate`, { method: "POSt" });
+		const res = await fetch(`${window.api}/projects/${newProjectId}/activate`, { method: "POST" });
 		const body = (await res.json()) as CurrentProjectType;
 
 		set(body);
+
+		// Update State
+		state.update((state) => {
+			state.proxyPort = undefined;
+			state.mode = "pause";
+			return state;
+		});
 
 		// Change website title
 		//@ts-ignore-error Document not found
@@ -36,6 +44,13 @@ function useCurrentProject() {
 		}, 1);
 	}
 
+	function setActiveProject(project: Project) {
+		set({
+			...project,
+			currentRoute: undefined,
+		});
+	}
+
 	// TODO: SSE to update routes
 
 	// Store store
@@ -44,6 +59,7 @@ function useCurrentProject() {
 		set,
 		update,
 		activate,
+		setActiveProject,
 		changeRoute,
 	};
 

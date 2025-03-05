@@ -1,11 +1,20 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
 
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
-import { Context, Server, req, res, setCORS } from "https://deno.land/x/faster@v12.1/mod.ts";
+import {
+	Context,
+	NextFunc,
+	RouteFn,
+	Server,
+	req,
+	res,
+	setCORS,
+} from "https://deno.land/x/faster@v12.1/mod.ts";
 
 import { exists, genId, serialize } from "../utils.ts";
 import { ProjectType, ProxyState, StateType } from "../types.ts";
 import { Project } from "./project.ts";
+import { DisabledInDemoModeError } from "../api/error.ts";
 
 export class ProjectManager {
 	projects: { [key: string]: Project } = {};
@@ -90,10 +99,16 @@ export class ProjectManager {
 
 	async args() {
 		const flags = parseArgs(Deno.args, {
-			boolean: ["serve", "capture"],
+			boolean: ["serve", "capture", "demo"],
 			string: ["project"],
-			default: { capture: false, serve: false },
+			default: { capture: false, serve: false, demo: false },
 		});
+
+		this.state.demo = flags.demo;
+
+		if (this.state.demo) {
+			console.log("DEMO MODE IS ENABLED");
+		}
 
 		// Activate project
 		if (flags.project !== undefined) {
@@ -174,6 +189,15 @@ export class ProjectManager {
 	}
 
 	routes(server: Server) {
+		/* Helpers */
+		async function blockDemo(ctx: Context, next: NextFunc) {
+			if (projectManager.state.demo) {
+				throw new DisabledInDemoModeError();
+			}
+
+			await next();
+		}
+
 		/* Projects */
 
 		/**
@@ -257,6 +281,7 @@ export class ProjectManager {
 		server.delete(
 			"/projects/:projectId",
 			setCORS(),
+			blockDemo,
 			(async (ctx: Context) => {
 				const projectId = ctx.params.projectId;
 
@@ -298,6 +323,7 @@ export class ProjectManager {
 		server.post(
 			"/projects",
 			setCORS(),
+			blockDemo,
 			req("json"),
 			res("json"),
 			(async (ctx: Context) => {
@@ -339,6 +365,7 @@ export class ProjectManager {
 		server.post(
 			"/projects/:projectId",
 			setCORS(),
+			blockDemo,
 			req("json"),
 			res("json"),
 			(async (ctx: Context) => {
@@ -460,6 +487,7 @@ export class ProjectManager {
 		server.delete(
 			"/projects/:projectId/routes/:routeId",
 			setCORS(),
+			blockDemo,
 			(async (ctx: Context) => {
 				const projectId = ctx.params.projectId;
 				const routeId = ctx.params.routeId;
@@ -540,6 +568,10 @@ export class ProjectManager {
 				}
 
 				if (body.state === "capture") {
+					if (this.state.demo) {
+						throw new DisabledInDemoModeError();
+					}
+
 					this.state.proxyPort = await this.activeProject.capture();
 				}
 
@@ -557,4 +589,5 @@ export class ProjectManager {
 	}
 }
 
-export default new ProjectManager();
+const projectManager = new ProjectManager();
+export default projectManager;

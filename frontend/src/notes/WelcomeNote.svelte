@@ -2,7 +2,10 @@
 	import Icon from "@iconify/svelte";
 </script>
 
-<p class="indent">Note: This is a demo instance. Changes to any project are disable!</p>
+<p class="indent">
+	Note: This is a demo instance. You cannot edit or delete projects, you can only switch between Pause and
+	Serve mode.
+</p>
 
 <br />
 
@@ -11,7 +14,7 @@
 
 <br />
 
-<p>Record and simulate your private internal REST APIs for easy and secure public "deployments".</p>
+<p>Record and simulate your private internal REST APIs for easy and secure public demonstrations.</p>
 
 <br />
 

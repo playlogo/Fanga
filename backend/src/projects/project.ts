@@ -63,6 +63,11 @@ export class Project {
 	}
 
 	async load() {
+		// Reset
+		this.#routeContent = {};
+		this.#routeIdToPath = {};
+		this.#routeList = [];
+
 		this.project.active = true;
 
 		// Parse file
