@@ -23,7 +23,7 @@
 <Proxy />
 <Routes />
 
-<main>
+<main class="scrollbar">
 	{#if $currentProject}
 		{#if $currentProject.currentRoute && $currentProject.currentRoute !== "switching"}
 			<RouteInspector route={$currentProject.currentRoute} />

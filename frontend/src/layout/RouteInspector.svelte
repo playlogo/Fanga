@@ -29,7 +29,7 @@
 <div class="main">
 	<div class="topbar">
 		{@render tag(colorTable[route.method] ?? themes["green"], route.method)}
-		<h2>{route.path}</h2>
+		<h2 title={route.path}>{route.path}</h2>
 	</div>
 	<div class="entry request">
 		<div class="header">
@@ -77,6 +77,10 @@
 		font-style: normal;
 		font-weight: 700;
 		line-height: normal;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 90%;
 	}
 
 	/* Entry */

@@ -22,6 +22,13 @@
 		xml: xml,
 		yaml: yaml,
 	};
+
+	// Pretty print json
+	if (lang === "json") {
+		try {
+			content = JSON.stringify(JSON.parse(content), null, 4);
+		} catch (err) {}
+	}
 </script>
 
 <div class="code">
