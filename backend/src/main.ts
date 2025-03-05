@@ -1,6 +1,7 @@
 import { Server, setCORS } from "https://deno.land/x/faster@v12.1/mod.ts";
 import staticRoutes from "./api/static.ts";
 import projectManager from "./projects/projectManager.ts";
+import { DisabledInDemoModeError } from "./api/error.ts";
 
 const server = new Server();
 
@@ -8,6 +9,14 @@ server.useAtBeginning(async (ctx, next) => {
 	await next();
 
 	const error = ctx.error;
+
+	if (error instanceof DisabledInDemoModeError) {
+		ctx.res.status = 500;
+		ctx.res.body = error.message;
+		ctx.error = error.message;
+
+		return;
+	}
 
 	if (error) {
 		console.error(error);
