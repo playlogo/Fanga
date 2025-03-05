@@ -144,6 +144,7 @@ export class Project {
 		// Store request body
 		this.server.useAtBeginning(async (ctx, next) => {
 			if (!ctx.req.body) {
+				await next();
 				return;
 			}
 
@@ -214,39 +215,36 @@ export class Project {
 			requestBodyType = requestBodyType.split(";")[0];
 			responseBodyType = responseBodyType.split(";")[0];
 
+			// Break SSE
+			if (
+				responseBodyType === "text/event-stream" ||
+				!(responseBodyType.startsWith("application") || responseBodyType.startsWith("text"))
+			) {
+				throw new Error("Cancel");
+			}
+
 			// Bodies: Only store "plaintext" (html, json, etc.) requests & responses
 			let decodedResponse;
 
 			if (responseBody !== null) {
 				try {
-					const read = await responseBody.getReader().read();
-					decodedResponse = new TextDecoder().decode(read.value);
+					// Read entire body
+					const reader = responseBody.getReader();
+					let total = new Uint8Array();
+
+					let r;
+					while (!(r = await reader.read()).done) {
+						total = new Uint8Array([...total, ...r.value]);
+					}
+
+					decodedResponse = new TextDecoder().decode(total);
 				} catch (err) {}
 			}
 
-			// Delete old stored route
+			// Store: Either overwrite stored route, or create new one
 			const index = this.#routeList.findIndex(
 				(entry) => `${entry.method}/${entry.path}` === `${method}/${url}`
 			);
-
-			if (index != -1) {
-				delete this.#routeIdToPath[this.#routeList[index].id];
-				delete this.#routeContent[url][method];
-				this.#routeList.splice(index, 1);
-			}
-
-			// Store route
-			const id = genId(10);
-
-			this.#routeList.push({
-				id: id,
-				method: method,
-				path: url,
-				requestType: requestBodyType,
-				responseType: responseBodyType,
-			});
-
-			this.#routeIdToPath[id] = [url, method];
 
 			if (this.#routeContent[url] === undefined) {
 				this.#routeContent[url] = {};
@@ -257,6 +255,24 @@ export class Project {
 				resType: responseBodyType,
 				req: requestBody,
 			};
+
+			if (index != -1) {
+				this.#routeList[index].requestType = requestBodyType;
+				this.#routeList[index].responseType = responseBodyType;
+			} else {
+				// Store route
+				const id = genId(10);
+
+				this.#routeList.push({
+					id: id,
+					method: method,
+					path: url,
+					requestType: requestBodyType,
+					responseType: responseBodyType,
+				});
+
+				this.#routeIdToPath[id] = [url, method];
+			}
 		};
 
 		this.server.get("*", proxy({ url: this.project.url }), handler.bind(this));

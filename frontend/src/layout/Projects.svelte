@@ -27,6 +27,8 @@
 
 		border-right: 1px solid var(--border-accent);
 		border-bottom: 1px solid var(--border-accent);
+
+		overflow-y: auto;
 	}
 
 	.topbar {

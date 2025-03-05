@@ -306,7 +306,7 @@ export class ProjectManager {
 				const newProject: ProjectType = {
 					name: body.name,
 					routes: [],
-					url: body.url,
+					url: body.url.replace(/\/$/, ""),
 					fileName: serialize(body.name) + ".jsonl",
 					id: genId(10),
 				};

@@ -80,6 +80,8 @@ function useProjects() {
 		const cb = async (res: any) => {
 			await projects.createProject(res.name, res.url);
 			modal.set(undefined);
+
+			window.location.reload();
 		};
 
 		modal.set({

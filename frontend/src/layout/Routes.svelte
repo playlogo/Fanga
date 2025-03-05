@@ -5,7 +5,7 @@
 	import RouteEntry from "../components/RouteEntry.svelte";
 </script>
 
-<div class="main">
+<div class="main scrollbar">
 	<div class="top">
 		<h2>Routes</h2>
 	</div>
@@ -30,6 +30,8 @@
 		flex-direction: column;
 
 		border-right: 1px solid var(--border-accent);
+
+		overflow-y: auto;
 	}
 
 	.top {
