@@ -37,7 +37,7 @@
 			<p>{route.requestType}</p>
 		</div>
 		{#if requestContent}
-			<CodeViewer content={requestContent} lang={"text"} />
+			<CodeViewer content={requestContent} lang={route.requestType.split("/")[1]} />
 		{/if}
 	</div>
 	<div class="entry response">
@@ -46,7 +46,7 @@
 			<p>{route.responseType}</p>
 		</div>
 		{#if responseContent}
-			<CodeViewer content={responseContent} lang={"json"} />
+			<CodeViewer content={responseContent} lang={route.responseType.split("/")[1]} />
 		{/if}
 	</div>
 </div>

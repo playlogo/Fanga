@@ -79,6 +79,7 @@ function useProjects() {
 	function openCreateModal() {
 		const cb = async (res: any) => {
 			await projects.createProject(res.name, res.url);
+			modal.set(undefined);
 		};
 
 		modal.set({
@@ -136,7 +137,7 @@ function useProjects() {
 					callback: modal.close,
 				},
 				{
-					label: "Update",
+					label: "DELETE",
 					color: "warning",
 					callback: callback.bind(project),
 				},
@@ -149,8 +150,8 @@ function useProjects() {
 			// @ts-expect-error this any
 			const project: Project = this;
 
-			const name = res.inputs["name"];
-			const url = res.inputs["url"];
+			const name = res["name"];
+			const url = res["url"];
 
 			await fetch(`${window.api}/projects/${project.id}`, {
 				method: "POST",
@@ -170,15 +171,15 @@ function useProjects() {
 			inputs: [
 				{
 					type: "text",
-					label: "Target URL for proxy",
-					id: "url",
-					default: project.url,
+					label: "Name",
+					id: "name",
+					default: project.name,
 				},
 				{
 					type: "text",
-					label: "Project name",
-					id: "name",
-					default: project.name,
+					label: "Target URL",
+					id: "url",
+					default: project.url,
 				},
 			],
 			actions: [

@@ -1,7 +1,7 @@
 /* State */
 export interface State {
 	mode: "capture" | "serve" | "pause";
-	proxyUrl?: string;
+	proxyPort?: string;
 	demo: boolean;
 }
 
@@ -45,5 +45,5 @@ export interface ModalAction {
 
 /* Current project */
 export type CurrentProjectType = Project & {
-	currentRoute?: Route;
+	currentRoute: Route | undefined | "switching";
 };

@@ -8,6 +8,7 @@
     "jsr:@std/async@^1.0.7": "1.0.9",
     "jsr:@std/bytes@1": "1.0.4",
     "jsr:@std/bytes@^1.0.2": "1.0.4",
+    "jsr:@std/cli@*": "1.0.9",
     "jsr:@std/crypto@1": "1.0.3",
     "jsr:@std/crypto@^1.0.3": "1.0.3",
     "jsr:@std/encoding@*": "1.0.6",
@@ -65,6 +66,9 @@
     },
     "@std/bytes@1.0.4": {
       "integrity": "11a0debe522707c95c7b7ef89b478c13fb1583a7cfb9a85674cd2cc2e3a28abc"
+    },
+    "@std/cli@1.0.9": {
+      "integrity": "557e5865af000efbf3f737dcfea5b8ab86453594f4a9cd8d08c9fa83d8e3f3bc"
     },
     "@std/crypto@1.0.3": {
       "integrity": "a2a32f51ddef632d299e3879cd027c630dcd4d1d9a5285d6e6788072f4e51e7f"

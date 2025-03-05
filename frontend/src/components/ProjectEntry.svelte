@@ -59,11 +59,17 @@
 	}
 
 	.container:hover {
-		background-color: #ffffff;
+		background-color: var(--border);
+		cursor: pointer;
 	}
 
 	.active {
 		cursor: default !important;
+	}
+
+	.active:hover {
+		cursor: default;
+		background-color: transparent;
 	}
 
 	.left {

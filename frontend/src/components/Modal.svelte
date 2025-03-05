@@ -12,6 +12,10 @@
 
 		for (const entry of get(modal)!.inputs) {
 			values[entry.id] = (document.getElementById(entry.id) as HTMLInputElement).value;
+
+			if (`${values[entry.id]}`.length === 0) {
+				values[entry.id] = (document.getElementById(entry.id) as HTMLInputElement).placeholder;
+			}
 		}
 
 		await callback(values);

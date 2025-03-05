@@ -20,7 +20,7 @@ export type ProxyState = "capture" | "serve" | "pause";
 export interface StateType {
 	currentProject: string | undefined;
 	mode: ProxyState;
-	proxyUrl: string;
+	proxyPort?: number;
 	demo: boolean;
 }
 

@@ -5,7 +5,7 @@ import type { State } from "./types";
 /* State */
 function useState() {
 	const { subscribe, set, update } = writable<State>(
-		{ mode: "pause", proxyUrl: undefined, demo: false },
+		{ mode: "pause", proxyPort: undefined, demo: false },
 		function start() {
 			(async () => {
 				// Fetch state
@@ -33,8 +33,10 @@ function useState() {
 		});
 
 		if (res.ok) {
+			const body = await res.json();
 			update((state) => {
 				state.mode = newMode;
+				state.proxyPort = body.proxyPort;
 
 				return state;
 			});

@@ -25,9 +25,9 @@
 
 <main>
 	{#if $currentProject}
-		{#if $currentProject.currentRoute}
+		{#if $currentProject.currentRoute && $currentProject.currentRoute !== "switching"}
 			<RouteInspector route={$currentProject.currentRoute} />
-		{:else}
+		{:else if $currentProject.currentRoute !== "switching"}
 			<Note><WelcomeNote /></Note>
 		{/if}
 	{:else}

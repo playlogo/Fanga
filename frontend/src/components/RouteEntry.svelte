@@ -14,6 +14,7 @@
 	onclick={() => {
 		currentProject.changeRoute(route.id);
 	}}
+	class:active={$currentProject!.currentRoute?.id === route.id}
 >
 	<div class="path">
 		{@render tag(colorTable[route.method] ?? themes["green"], route.method)}
@@ -32,6 +33,22 @@
 		flex-direction: column;
 
 		border-bottom: 1px solid var(--border);
+	}
+
+	.main:hover {
+		background-color: var(--border);
+		cursor: pointer;
+	}
+
+	.active {
+		cursor: default !important;
+
+		background-color: #2c2c2c96;
+	}
+
+	.active:hover {
+		cursor: default;
+		background-color: #2c2c2c96;
 	}
 
 	.path {

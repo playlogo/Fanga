@@ -3,7 +3,7 @@ import { Context, Server, proxy } from "https://deno.land/x/faster@v12.1/mod.ts"
 
 import { JsonParseStream } from "jsr:@std/json@0.224.0/json-parse-stream";
 
-import { genId, hash } from "../utils.ts";
+import { exists, genId, hash } from "../utils.ts";
 import { ProjectType, RouteSerializedType, RouteType } from "../types.ts";
 
 import { ProjectManager } from "./projectManager.ts";
@@ -17,8 +17,9 @@ export class Project {
 	#routeContent: {
 		[key: string]: {
 			[key: string]: {
-				req: unknown;
-				res: unknown;
+				req?: string;
+				res?: string;
+				resType?: string;
 			};
 		};
 	} = {};
@@ -36,12 +37,16 @@ export class Project {
 
 		this.project.active = false;
 
+		if (await exists(`projects/${this.project.fileName}`)) {
+			await Deno.remove(`./projects/${this.project.fileName}`);
+		}
+
 		// Serialize
 		const encoder = new TextEncoder();
 		const file = await Deno.open(`projects/${this.project.fileName}`, { create: true, write: true });
 
 		// Heading
-		await file.write(encoder.encode(JSON.stringify(this.project)));
+		await file.write(encoder.encode(JSON.stringify(this.project) + "\n"));
 
 		// Routes
 		for (const route of this.#routeList) {
@@ -49,6 +54,7 @@ export class Project {
 
 			entry.request = this.#routeContent[route.path][route.method].req;
 			entry.response = this.#routeContent[route.path][route.method].res;
+			entry.responseType = this.#routeContent[route.path][route.method].resType;
 
 			await file.write(encoder.encode(JSON.stringify(entry) + "\n"));
 		}
@@ -89,7 +95,11 @@ export class Project {
 				this.#routeContent[route.path] = {};
 			}
 
-			this.#routeContent[route.path][route.method] = { res: route.response, req: route.request };
+			this.#routeContent[route.path][route.method] = {
+				res: route.response,
+				req: route.request,
+				resType: route.responseType,
+			};
 			this.#routeIdToPath[route.id] = [route.path, route.method];
 		}
 	}
@@ -129,7 +139,7 @@ export class Project {
 
 		this.server = new Server();
 
-		const requestBodyCache: { [key: string]: ReadableStream<Uint8Array> } = {};
+		const requestBodyCache: { [key: string]: string } = {};
 
 		// Store request body
 		this.server.useAtBeginning(async (ctx, next) => {
@@ -137,7 +147,9 @@ export class Project {
 				return;
 			}
 
-			const rayId = await hash(`${ctx.req.method}/${ctx.req.url}`);
+			const url = new URL(ctx.req.url);
+			const path = ctx.req.url.replace(url.protocol + "//", "").replace(url.host, "");
+			const rayId = await hash(`${ctx.req.method}/${path}`);
 
 			const [requestBodyOriginal, requestBodyCopy] = ctx.req.body.tee();
 
@@ -147,7 +159,15 @@ export class Project {
 				method: ctx.req.method,
 			});
 
-			requestBodyCache[rayId] = requestBodyCopy;
+			// Decode request body
+			let decodedRequestBody;
+
+			try {
+				const read = await requestBodyCopy.getReader().read();
+				decodedRequestBody = new TextDecoder().decode(read.value);
+			} catch (err) {}
+
+			requestBodyCache[rayId] = decodedRequestBody!;
 
 			// Continue
 			await next();
@@ -166,10 +186,12 @@ export class Project {
 
 			// Get bodies
 			let requestBodyType = ctx.req.headers.get("content-type") ?? "empty";
-			let requestBody = ctx.req.body;
+			let requestBody: any = ctx.req.body;
 
 			if (requestBody !== null) {
-				const rayId = await hash(`${ctx.req.method}/${ctx.req.url}`);
+				const url = new URL(ctx.req.url);
+				const path = ctx.req.url.replace(url.protocol + "//", "").replace(url.host, "");
+				const rayId = await hash(`${ctx.req.method}/${path}`);
 
 				if (requestBodyCache[rayId]) {
 					requestBody = requestBodyCache[rayId];
@@ -178,16 +200,29 @@ export class Project {
 			}
 
 			let responseBodyType = ctx.res.headers.get("content-type") ?? "empty";
-			let responseBody = ctx.res.body;
+			let responseBody = ctx.res.body as ReadableStream<Uint8Array> | null;
 
 			if (responseBody !== null) {
-				const [responseBodyOriginal, responseBodyCopy] = ctx.res.body?.tee();
+				const [responseBodyOriginal, responseBodyCopy] = (ctx.res
+					.body as ReadableStream<Uint8Array> | null)!.tee();
 				ctx.res.body = responseBodyOriginal;
 
 				responseBody = responseBodyCopy;
 			}
 
-			// TODO: Types: only store text/plain, not encoding utf-8 etc
+			// Types: only store text/plain, not encoding utf-8 etc
+			requestBodyType = requestBodyType.split(";")[0];
+			responseBodyType = responseBodyType.split(";")[0];
+
+			// Bodies: Only store "plaintext" (html, json, etc.) requests & responses
+			let decodedResponse;
+
+			if (responseBody !== null) {
+				try {
+					const read = await responseBody.getReader().read();
+					decodedResponse = new TextDecoder().decode(read.value);
+				} catch (err) {}
+			}
 
 			// Delete old stored route
 			const index = this.#routeList.findIndex(
@@ -204,7 +239,7 @@ export class Project {
 			const id = genId(10);
 
 			this.#routeList.push({
-				id: genId(10),
+				id: id,
 				method: method,
 				path: url,
 				requestType: requestBodyType,
@@ -218,20 +253,23 @@ export class Project {
 			}
 
 			this.#routeContent[url][method] = {
-				res: responseBody,
+				res: decodedResponse,
+				resType: responseBodyType,
 				req: requestBody,
 			};
 		};
 
-		this.server.get("*", proxy({ url: this.project.url }), handler);
-		this.server.put("*", proxy({ url: this.project.url }), handler);
-		this.server.post("*", proxy({ url: this.project.url }), handler);
-		this.server.delete("*", proxy({ url: this.project.url }), handler);
+		this.server.get("*", proxy({ url: this.project.url }), handler.bind(this));
+		this.server.put("*", proxy({ url: this.project.url }), handler.bind(this));
+		this.server.post("*", proxy({ url: this.project.url }), handler.bind(this));
+		this.server.delete("*", proxy({ url: this.project.url }), handler.bind(this));
 
 		// Start listening
 		console.log("[routes] Capturing");
 
 		this.server!.listen({ port: 8001 });
+
+		return 8001;
 	}
 
 	async serve() {
@@ -239,19 +277,35 @@ export class Project {
 
 		this.server = new Server();
 
-		this.server.get("*", async (ctx: Context) => {
-			console.log(ctx.req.url);
-			console.log(ctx.req.method);
+		const handler = async (ctx: Context) => {
+			const url = new URL(ctx.req.url);
+			const path = ctx.req.url.replace(url.protocol + "//", "").replace(url.host, "");
 
-			if (ctx.req.body !== null) {
-				console.log(ctx.req.headers);
+			if (this.#routeContent[path] !== undefined) {
+				if (this.#routeContent[path][ctx.req.method] !== undefined) {
+					const entry = this.#routeContent[path][ctx.req.method];
+
+					if (entry.res !== undefined) {
+						ctx.res.headers.append("Content-type", entry.resType!);
+						ctx.res.body = new TextEncoder().encode(entry.res);
+					}
+
+					return;
+				}
 			}
-		});
+
+			ctx.res.status = 404;
+		};
+
+		this.server.get("*", handler.bind(this));
+		this.server.put("*", handler.bind(this));
+		this.server.post("*", handler.bind(this));
+		this.server.delete("*", handler.bind(this));
 
 		// Start listening
-		console.log("serving");
-
 		this.server!.listen({ port: 8001 });
+
+		return 8001;
 	}
 
 	async pause() {
@@ -259,5 +313,7 @@ export class Project {
 			await this.server.server.shutdown();
 			this.server = undefined;
 		}
+
+		return undefined;
 	}
 }

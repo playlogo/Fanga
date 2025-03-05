@@ -9,7 +9,7 @@
 		url.classList.remove("success");
 		url.classList.remove("error");
 
-		navigator.clipboard.writeText($state.proxyUrl!).then(
+		navigator.clipboard.writeText(proxyUrl).then(
 			function () {
 				url.classList.add("success");
 			},
@@ -19,14 +19,16 @@
 			}
 		);
 	}
+
+	let proxyUrl = $derived(`${window.location.protocol}//${window.location.hostname}:${$state.proxyPort}`);
 </script>
 
 <div class="main">
 	<h2>Proxy</h2>
 
-	{#if $state.proxyUrl}
+	{#if $state.proxyPort}
 		<div class="url" bind:this={url}>
-			<input type="text" readonly value={$state.proxyUrl} />
+			<input type="text" readonly value={proxyUrl} />
 			<button onclick={copyProxyUrl}>
 				<Icon icon="lucide:copy" width="16px" height="16px" />
 			</button>
