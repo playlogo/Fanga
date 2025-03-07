@@ -41,5 +41,7 @@
 
 		border-left: 4px solid var(--border-accent);
 		background-color: var(--border);
+
+		margin-bottom: 8px;
 	}
 </style>

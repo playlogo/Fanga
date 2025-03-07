@@ -12,6 +12,8 @@
 	<p class="indent">
 		Tip: Click on a route to inspect it. Or go to the proxy url to see the captured API in action!
 	</p>
+
+	<p class="indent">Fun fact: The 'Fanga' project is a capture of Fanga using Fanga!</p>
 {/if}
 
 <br />
@@ -65,9 +67,5 @@
 		padding-right: 12px;
 		padding-top: 6px;
 		padding-bottom: 6px;
-	}
-
-	hr {
-		border-color: var(--border-accent);
 	}
 </style>

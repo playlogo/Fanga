@@ -31,6 +31,19 @@ function useCurrentProject() {
 	}
 
 	async function changeRoute(newRouteId: string) {
+		const current = get(store)?.currentRoute;
+
+		if (current && current !== "switching") {
+			if (current.id === newRouteId) {
+				update((state) => {
+					state!.currentRoute = undefined;
+					return state;
+				});
+
+				return;
+			}
+		}
+
 		update((state) => {
 			state!.currentRoute = "switching";
 			return state;
