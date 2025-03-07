@@ -1,15 +1,7 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
 
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
-import {
-	Context,
-	NextFunc,
-	RouteFn,
-	Server,
-	req,
-	res,
-	setCORS,
-} from "https://deno.land/x/faster@v12.1/mod.ts";
+import { Context, NextFunc, Server, req, res, setCORS } from "https://deno.land/x/faster@v12.1/mod.ts";
 
 import { exists, genId, serialize } from "../utils.ts";
 import { ProjectType, ProxyState, StateType } from "../types.ts";
@@ -190,7 +182,7 @@ export class ProjectManager {
 
 	routes(server: Server) {
 		/* Helpers */
-		async function blockDemo(ctx: Context, next: NextFunc) {
+		async function blockDemo(_ctx: Context, next: NextFunc) {
 			if (projectManager.state.demo) {
 				throw new DisabledInDemoModeError();
 			}

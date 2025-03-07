@@ -29,9 +29,11 @@
 	{#if $state.proxyPort}
 		<div class="url" bind:this={url}>
 			<input type="text" readonly value={proxyUrl} />
+			<!--
 			<button onclick={copyProxyUrl}>
 				<Icon icon="lucide:copy" width="16px" height="16px" />
 			</button>
+			-->
 		</div>
 
 		<p>Use this address in your Browser/App to access the api</p>

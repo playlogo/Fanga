@@ -171,7 +171,9 @@ export class Project {
 			try {
 				const read = await requestBodyCopy.getReader().read();
 				decodedRequestBody = new TextDecoder().decode(read.value);
-			} catch (err) {}
+			} catch (_err) {
+				// Ignore
+			}
 
 			requestBodyCache[rayId] = decodedRequestBody!;
 
@@ -243,7 +245,9 @@ export class Project {
 					}
 
 					decodedResponse = new TextDecoder().decode(total);
-				} catch (err) {}
+				} catch (_err) {
+					// Empty
+				}
 			}
 
 			// Store: Either overwrite stored route, or create new one
@@ -298,7 +302,7 @@ export class Project {
 
 		this.server = new Server();
 
-		const handler = async (ctx: Context) => {
+		const handler = (ctx: Context) => {
 			const url = new URL(ctx.req.url);
 			const path = ctx.req.url.replace(url.protocol + "//", "").replace(url.host, "");
 

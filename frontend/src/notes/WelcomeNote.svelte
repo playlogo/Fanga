@@ -1,11 +1,18 @@
 <script>
 	import Icon from "@iconify/svelte";
+	import { state } from "../stores/state";
 </script>
 
-<p class="indent">
-	Note: This is a demo instance. You cannot edit or delete projects, you can only switch between Pause and
-	Serve mode.
-</p>
+{#if $state.demo}
+	<p class="indent">
+		Note: This is a demo instance. Editing or deleting projects, as well as capturing new routes is
+		disabled.
+	</p>
+
+	<p class="indent">
+		Tip: Click on a route to inspect it. Or go to the proxy url to see the captured API in action!
+	</p>
+{/if}
 
 <br />
 
@@ -14,24 +21,42 @@
 
 <br />
 
-<p>Record and simulate your private internal REST APIs for easy and secure public demonstrations.</p>
+<p>
+	Record requests and responses of your private internal REST APIs and serve the captured routes later for
+	easy public read-only demonstrations.
+</p>
 
 <br />
 
 <p>
-	Check out this project on Github: <button
+	Checkout this project on Github: <button
 		onclick={() => {
 			//@ts-expect-error: cannot assign string
 			window.location = "https://github.com/playlogo/Fanga";
 		}}
-		class="button github"><Icon icon="mdi:github" width="24px" height="24px" />playlogo/Fanga</button
+		class="button github"
+		style="background-color: black;"
 	>
+		<Icon icon="mdi:github" width="24px" height="24px" />playlogo/Fanga
+	</button>
+</p>
+
+<br />
+
+<p>
+	Checkout the backend API docs: <button
+		onclick={() => {
+			//@ts-expect-error: cannot assign string
+			window.location = "/docs.html";
+		}}
+		class="button github"
+	>
+		<Icon icon="eos-icons:api" width="24px" height="24px" />/docs.html
+	</button>
 </p>
 
 <style>
 	button.github {
-		background-color: black;
-
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -40,5 +65,9 @@
 		padding-right: 12px;
 		padding-top: 6px;
 		padding-bottom: 6px;
+	}
+
+	hr {
+		border-color: var(--border-accent);
 	}
 </style>
